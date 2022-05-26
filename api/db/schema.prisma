@@ -7,13 +7,37 @@ generator client {
   provider      = "prisma-client-js"
 }
 
-// Define your own datamodels here and run `yarn redwood prisma migrate dev`
-// to create migrations for them and apply to your dev DB.
-// TODO: Please remove the following example:
+
+// Core User Model
+
 model User {
   id                  String        @id @db.Uuid @unique
   createdAt           DateTime      @default(now())
   name                String?
   email               String?       @unique
   image               String?
+  storyboards         Storyboard[]
+}
+
+// Storyboard Models
+
+model Storyboard {
+  id                  String        @id @default(cuid())
+  title               String
+  description         String
+  channel             String
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  owner               User          @relation(fields: [userId], references: [id])
+  userId              String        @db.Uuid
+  boards              Board[]
+}
+
+model Board {
+  id                  String        @id @default(cuid())
+  script              String
+  actions             String[]
+  image               String
+  storyboard          Storyboard    @relation(fields: [storyboardId], references: [id])
+  storyboardId        String
 }

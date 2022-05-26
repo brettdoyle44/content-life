@@ -1,16 +1,17 @@
-import { Redirect, routes } from '@redwoodjs/router'
+import { Redirect, routes, navigate } from '@redwoodjs/router'
 import { MetaTags } from '@redwoodjs/web'
 import { Form, TextField, Submit } from '@redwoodjs/forms'
 import { useAuth } from '@redwoodjs/auth'
 import { FaGoogle } from 'react-icons/fa'
 
 const SigninPage = () => {
-  const { client: supabase, isAuthenticated } = useAuth()
+  const { client: supabase, isAuthenticated, currentUser } = useAuth()
   async function signInWithGoogle() {
     try {
       await supabase.auth.signIn({
         provider: 'google',
       })
+      navigate(routes.dashboard({ id: currentUser.sub as string }))
     } catch (error) {
       console.log('error:  ', error)
     }
@@ -20,11 +21,13 @@ const SigninPage = () => {
       await supabase.auth.signIn({
         email: data.email,
       })
+      navigate(routes.dashboard({ id: currentUser.sub as string }))
     } catch (error) {
       console.error('error:  ', error)
     }
   }
-  if (isAuthenticated) return <Redirect to={routes.dashboard()} />
+  if (isAuthenticated)
+    return <Redirect to={routes.dashboard({ id: currentUser.sub as string })} />
 
   return (
     <>
